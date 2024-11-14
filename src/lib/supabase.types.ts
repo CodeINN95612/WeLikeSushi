@@ -28,12 +28,45 @@ export type Database = {
 	};
 	public: {
 		Tables: {
+			restaurant_images: {
+				Row: {
+					created_at: string;
+					description: string;
+					id: string;
+					restaurant_id: string;
+					url: string;
+				};
+				Insert: {
+					created_at?: string;
+					description: string;
+					id?: string;
+					restaurant_id: string;
+					url: string;
+				};
+				Update: {
+					created_at?: string;
+					description?: string;
+					id?: string;
+					restaurant_id?: string;
+					url?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'restaurant_images_restaurant_id_fkey';
+						columns: ['restaurant_id'];
+						isOneToOne: false;
+						referencedRelation: 'restaurants';
+						referencedColumns: ['id'];
+					}
+				];
+			};
 			restaurants: {
 				Row: {
 					address: string;
 					city: string;
 					country: string;
 					created_at: string | null;
+					google_maps_url: string;
 					id: string;
 					name: string;
 					tags: string[];
@@ -43,6 +76,7 @@ export type Database = {
 					city: string;
 					country: string;
 					created_at?: string | null;
+					google_maps_url: string;
 					id?: string;
 					name: string;
 					tags: string[];
@@ -52,6 +86,7 @@ export type Database = {
 					city?: string;
 					country?: string;
 					created_at?: string | null;
+					google_maps_url?: string;
 					id?: string;
 					name?: string;
 					tags?: string[];
@@ -134,16 +169,19 @@ export type Database = {
 			};
 			rubric_elements: {
 				Row: {
+					description: string;
 					id: string;
 					name: string;
 					weight: number;
 				};
 				Insert: {
+					description: string;
 					id?: string;
 					name: string;
 					weight: number;
 				};
 				Update: {
+					description?: string;
 					id?: string;
 					name?: string;
 					weight?: number;
