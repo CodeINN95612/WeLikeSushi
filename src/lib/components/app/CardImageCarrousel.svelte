@@ -44,7 +44,7 @@
 					style="transform: translateX({-currentIndex * 100}%)"
 				>
 					<div class="flex h-full w-full items-center justify-center rounded-t-lg">
-						<img src={'/test-image.jpg'} alt={image.description} />
+						<img src={image.url} alt={image.description} />
 					</div>
 				</div>
 			{/each}

@@ -32,7 +32,7 @@
 {#snippet ImageElement(id: string | number, url: string, alt: string, onDelete: DeleteHandler)}
 	<div class="relative">
 		<img class="aspect-square object-cover" src={url} {alt} />
-		<button
+		<!-- <button
 			type="button"
 			class="absolute right-1 top-1 rounded-full bg-destructive p-1 text-destructive-foreground"
 			onclick={async () => {
@@ -44,7 +44,7 @@
 			}}
 		>
 			<X class="m-0 size-4" />
-		</button>
+		</button> -->
 	</div>
 {/snippet}
 

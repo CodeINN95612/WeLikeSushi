@@ -2,6 +2,8 @@ import type { RestaurantWithImages } from '$lib/models/RestaurantWithImages';
 import { supabase } from '$lib/supabase';
 import type { PageServerLoad } from './$types';
 
+import { PRIVATE_STORAGE_URL } from '$env/static/private';
+
 export const load: PageServerLoad = async () => {
 	try {
 		const { data, error } = await supabase.from('restaurants').select('*, restaurant_images(*)');
@@ -16,7 +18,8 @@ export const load: PageServerLoad = async () => {
 		data.forEach((restaurant) => {
 			if (restaurant.restaurant_images) {
 				restaurant.restaurant_images.forEach((image) => {
-					image.url = `${supabase.storage.from('restaurant_images').getPublicUrl(image.url)}`;
+					image.url = `${PRIVATE_STORAGE_URL}/${image.url}`;
+					console.log(image.url);
 				});
 			}
 		});

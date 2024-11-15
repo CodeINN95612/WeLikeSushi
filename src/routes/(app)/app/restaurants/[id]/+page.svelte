@@ -13,6 +13,7 @@
 	import Alert from '$lib/components/ui/alert/alert.svelte';
 	import { page } from '$app/stores';
 	import ImageInputWithGallery from './ImageInputWithGallery.svelte';
+	import { error } from '@sveltejs/kit';
 
 	const id = $page.params.id;
 	let { data, form }: { data: PageData } & { form: ActionData } = $props();
@@ -82,6 +83,16 @@
 						</Button>
 					{/if}
 				</div>
+				{#if form?.error}
+					<Alert variant="destructive">{form.error}</Alert>
+				{/if}
+				{#if form?.validationErrors}
+					<Alert variant="destructive">
+						{#each Object.values(form.validationErrors) as error}
+							<p>{error}</p>
+						{/each}
+					</Alert>
+				{/if}
 			</div>
 			<div class="space-y-4">
 				<ImageInputWithGallery
@@ -105,18 +116,4 @@
 			</div>
 		</div>
 	</form>
-{/if}
-<!-- Display newly added images -->
-{#if newImages.length > 0}
-	<div class="new-images-preview">
-		{#each newImages as newImage, index}
-			<div class="relative">
-				<img
-					class="size-[200px] object-cover"
-					src={URL.createObjectURL(newImage)}
-					alt="Restaurant"
-				/>
-			</div>
-		{/each}
-	</div>
 {/if}

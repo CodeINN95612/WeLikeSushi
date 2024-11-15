@@ -5,6 +5,8 @@ import type { PageServerLoad } from './$types';
 import type { RestaurantInsert } from '$lib/models/RestaurantInsert';
 import type { RestaurantUpdate } from '$lib/models/RestaurantUpdate';
 import type { TablesInsert } from '$lib/supabase.types';
+import { PRIVATE_STORAGE_URL } from '$env/static/private';
+import sharp from 'sharp';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const { id } = params;
@@ -39,6 +41,10 @@ export const load: PageServerLoad = async ({ params }) => {
 			restaurant: emptyRestaurant
 		};
 	}
+
+	data.restaurant_images.forEach((image) => {
+		image.url = `${PRIVATE_STORAGE_URL}/${image.url}`;
+	});
 
 	return {
 		restaurant: data satisfies RestaurantWithImages
@@ -173,22 +179,21 @@ async function addNewRestaurant(restaurant: RestaurantInsert): Promise<string | 
 	}
 
 	const newid = crypto.randomUUID();
-	const insertedImages: { fullPath: string }[] = [];
-	let storageError: string | null = null;
+	const insertedImages: { path: string; fullPath: string }[] = [];
+	let storageError = await uploadImages(restaurant, newid, insertedImages);
 
-	// Helper function for image cleanup
-	const removeInsertedImages = async () => {
-		if (insertedImages.length > 0) {
-			await supabase.storage.from(STORAGE_BUCKET).remove(insertedImages.map((i) => i.fullPath));
-		}
-	};
+	if (storageError) {
+		await cleanupImages(insertedImages);
+		console.error('Storage Error:', storageError);
+		return storageError;
+	}
 
 	try {
 		// Upload images to Supabase Storage
 		for (const image of restaurant.images) {
 			const arrayBuffer = await image.arrayBuffer();
 			const buffer = Buffer.from(arrayBuffer);
-			const filePath = `r-id-${newid}/${image.name}`;
+			const filePath = `public/r-id-${newid}/${image.name}`;
 
 			const { data, error } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, buffer, {
 				contentType: image.type,
@@ -235,54 +240,103 @@ async function addNewRestaurant(restaurant: RestaurantInsert): Promise<string | 
 			throw new Error(`Failed to insert image metadata: ${imageInsertError.message}`);
 		}
 
-		redirect(302, '/app/restaurants');
+		return null;
 	} catch (error: unknown) {
-		console.error('Error adding restaurant:', typeof error, error);
-		await removeInsertedImages(); // Rollback uploaded images
-		return 'Error adding restaurant';
+		await cleanupImages(insertedImages);
+		console.error('Error adding restaurant:', error);
+		if (error instanceof Error) {
+			return error.message;
+		}
+
+		return 'Unknown error adding restaurant';
 	}
 }
 
 async function updateRestaurant(restaurant: RestaurantUpdate): Promise<string | null> {
-	//Insert new images
 	const insertedImages: { fullPath: string; path: string }[] = [];
-	let storageError: string | null = null;
-	for (const image of restaurant.images) {
-		// Convert file to a buffer
-		const arrayBuffer = await image.arrayBuffer();
-		const buffer = Buffer.from(arrayBuffer);
+	const storageError = await uploadImages(restaurant, restaurant.id, insertedImages);
 
-		// Define the file path and bucket name
-		const filePath = `public/r-id-${restaurant.id}/${image.name}`;
-
-		// Upload the file buffer to Supabase Storage
-		const { error, data } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, buffer, {
-			contentType: image.type, // Set the MIME type
-			upsert: true // Optionally overwrite existing files with the same name
-		});
-
-		if (error) {
-			storageError = error.message;
-			break;
-		}
-
-		if (data) {
-			insertedImages.push(data);
-		}
-	}
-
-	const removeInsertedImages = async () =>
-		await supabase.storage.from(STORAGE_BUCKET).remove(insertedImages.map((i) => i.path));
-
-	//if errors, delete all inserted images
 	if (storageError) {
-		const { error: removeError } = await removeInsertedImages();
-		console.log('storageError', storageError);
-		console.log('removerError', removeError);
+		await cleanupImages(insertedImages);
+		console.error('Storage Error:', storageError);
 		return storageError;
 	}
 
-	//Update Restaurant
+	const updateError = await updateRestaurantDetails(restaurant);
+
+	if (updateError) {
+		await cleanupImages(insertedImages);
+		console.error('Update Error:', updateError);
+		return updateError;
+	}
+
+	const imageInsertError = await insertRestaurantImages(restaurant, insertedImages);
+
+	if (imageInsertError) {
+		await cleanupImages(insertedImages);
+		console.error('Image Insert Error:', imageInsertError);
+		return imageInsertError;
+	}
+
+	return null;
+}
+
+async function uploadImages(
+	restaurant: RestaurantUpdate | RestaurantInsert,
+	restaurant_id: string,
+	insertedImages: { fullPath: string; path: string }[]
+): Promise<string | null> {
+	const MAX_IMAGE_WIDTH = 1920; // Maximum width of the image
+	const MAX_IMAGE_SIZE_MB = 2; // Maximum allowed size in MB
+	const MAX_IMAGE_SIZE_BYTES = MAX_IMAGE_SIZE_MB * 1024 * 1024;
+
+	for (const image of restaurant.images) {
+		try {
+			// Convert file to a buffer
+			const arrayBuffer = await image.arrayBuffer();
+			let buffer = Buffer.from(arrayBuffer);
+
+			// Optimize image using Sharp
+			const metadata = await sharp(buffer).metadata();
+
+			if (metadata.size && metadata.size > MAX_IMAGE_SIZE_BYTES) {
+				console.log(`Optimizing image: ${image.name}, original size: ${metadata.size} bytes`);
+
+				// Resize and compress image
+				buffer = await sharp(buffer)
+					.resize({
+						width: MAX_IMAGE_WIDTH,
+						withoutEnlargement: true // Avoid enlarging small images
+					})
+					.jpeg({ quality: 80 }) // Compress to 80% quality
+					.toBuffer();
+			}
+
+			const filePath = `public/r-id-${restaurant_id}/${image.name}`;
+			const { error, data } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, buffer, {
+				contentType: image.type,
+				upsert: true
+			});
+
+			if (error) return error.message;
+			if (data) insertedImages.push(data);
+		} catch (error) {
+			return error instanceof Error ? error.message : 'Unknown upload error';
+		}
+	}
+	return null;
+}
+
+async function cleanupImages(insertedImages: { fullPath: string; path: string }[]): Promise<void> {
+	if (insertedImages.length === 0) return;
+
+	const { error } = await supabase.storage
+		.from(STORAGE_BUCKET)
+		.remove(insertedImages.map((image) => image.path));
+	if (error) console.error('Cleanup Error:', error.message);
+}
+
+async function updateRestaurantDetails(restaurant: RestaurantUpdate): Promise<string | null> {
 	const { error } = await supabase
 		.from('restaurants')
 		.update({
@@ -295,30 +349,22 @@ async function updateRestaurant(restaurant: RestaurantUpdate): Promise<string | 
 		})
 		.eq('id', restaurant.id);
 
-	if (error) {
-		const { error: removeError } = await removeInsertedImages();
-		console.log('removerError', removeError);
-		return error.message;
-	}
+	return error ? error.message : null;
+}
 
+async function insertRestaurantImages(
+	restaurant: RestaurantUpdate,
+	insertedImages: { fullPath: string; path: string }[]
+): Promise<string | null> {
 	const imagesToInsert = insertedImages.map(
-		(i) =>
+		(image) =>
 			({
 				restaurant_id: restaurant.id,
-				url: i.fullPath,
+				url: image.fullPath,
 				description: `${restaurant.name} image`
 			}) satisfies TablesInsert<'restaurant_images'>
 	);
-	const { error: imageInsertError } = await supabase
-		.from('restaurant_images')
-		.insert(imagesToInsert);
 
-	if (imageInsertError) {
-		const { error: removeError } = await removeInsertedImages();
-		console.log('removerError', imageInsertError);
-		console.log('removerError', removeError);
-		return imageInsertError.message;
-	}
-
-	return null;
+	const { error } = await supabase.from('restaurant_images').insert(imagesToInsert);
+	return error ? error.message : null;
 }

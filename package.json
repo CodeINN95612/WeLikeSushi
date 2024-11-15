@@ -43,6 +43,7 @@
 		"@supabase/ssr": "^0.5.1",
 		"@supabase/supabase-js": "^2.46.1",
 		"mode-watcher": "^0.4.1",
+		"sharp": "^0.33.5",
 		"tailwindcss-animate": "^1.0.7"
 	}
 }
