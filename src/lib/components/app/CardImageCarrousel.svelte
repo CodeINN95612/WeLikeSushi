@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { RestaurantImage } from '$lib/models/RestaurantImage';
+	import type { RestaurantImage } from '$lib/models/restaurants/RestaurantImage';
 	import { Image } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 

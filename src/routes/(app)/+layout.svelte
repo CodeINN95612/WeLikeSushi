@@ -1,10 +1,22 @@
 <script lang="ts">
+	import { invalidateAll } from '$app/navigation';
 	import SideNav from '$lib/components/app/SideNav.svelte';
 	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
 	import WeLikeSushi from '$lib/components/app/WeLikeSushi.svelte';
+	import Button from '$lib/components/ui/button/button.svelte';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import type { Snippet } from 'svelte';
+	import type { LayoutData } from './$types';
 
-	let { children } = $props();
+	let { children, layoutData }: { children: Snippet; layoutData: LayoutData } = $props();
+
+	async function logout() {
+		const { error } = await layoutData.supabase.auth.signOut();
+		if (error) {
+			console.error(error);
+		}
+		//invalidateAll();
+	}
 </script>
 
 <div class="grid min-h-screen w-full md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr]">
@@ -22,9 +34,9 @@
 		</div>
 	</aside>
 	<div class="flex h-screen flex-col">
-		<header
-			class="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6"
-		></header>
+		<header class="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+			<Button onclick={logout} variant="link">Log Out</Button>
+		</header>
 		<div class="flex-1 overflow-y-auto">
 			<main class="container mt-10 pb-10">
 				{@render children()}

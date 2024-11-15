@@ -1,4 +1,4 @@
-import type { RestaurantWithImages } from '$lib/models/RestaurantWithImages';
+import type { RestaurantWithImages } from '$lib/models/restaurants/RestaurantWithImages';
 import { supabase } from '$lib/supabase';
 import type { PageServerLoad } from './$types';
 

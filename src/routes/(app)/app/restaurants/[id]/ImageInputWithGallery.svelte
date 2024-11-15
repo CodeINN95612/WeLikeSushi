@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Input from '$lib/components/ui/input/input.svelte';
 	import { Label } from '$lib/components/ui/label';
-	import type { RestaurantImage } from '$lib/models/RestaurantImage';
+	import type { RestaurantImage } from '$lib/models/restaurants/RestaurantImage';
 	import { Image, X } from 'lucide-svelte';
 	import type { ChangeEventHandler } from 'svelte/elements';
 

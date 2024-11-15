@@ -10,7 +10,7 @@
 		<Card.Title>Login</Card.Title>
 	</Card.Header>
 	<Card.Content>
-		<form method="POST" class="space-y-4">
+		<form method="POST" class="space-y-4" action="/auth?/login">
 			<div class="space-y-2">
 				<Label for="email">Email</Label>
 				<Input type="email" id="email" name="email" required />

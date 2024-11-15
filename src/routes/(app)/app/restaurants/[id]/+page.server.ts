@@ -1,9 +1,9 @@
-import type { RestaurantWithImages } from '$lib/models/RestaurantWithImages';
+import type { RestaurantWithImages } from '$lib/models/restaurants/RestaurantWithImages';
 import { supabase } from '$lib/supabase';
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { RestaurantInsert } from '$lib/models/RestaurantInsert';
-import type { RestaurantUpdate } from '$lib/models/RestaurantUpdate';
+import type { RestaurantInsert } from '$lib/models/restaurants/RestaurantInsert';
+import type { RestaurantUpdate } from '$lib/models/restaurants/RestaurantUpdate';
 import type { TablesInsert } from '$lib/supabase.types';
 import { PRIVATE_STORAGE_URL } from '$env/static/private';
 import sharp from 'sharp';
