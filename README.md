@@ -31,6 +31,15 @@ Originally this was made for me and my girlfriend to have a way to rate differen
    npm install
    ```
 
+4. Create a `.env.local` file in the root directory and add the following environment variables:
+
+   ```sh
+   PUBLIC_SUPABASE_URL=your_public_supabase_url
+   PUBLIC_SUPABASE_ANON_KEY=your_public_supabase_anon_key
+   PRIVATE_SUPABASE_SERVICE_ROLE_KEY=your_private_supabase_service_role_key
+   PRIVATE_STORAGE_URL=your_private_storage_url
+   ```
+
 ## Usage
 
 1. Start the development server:
