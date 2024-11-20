@@ -97,3 +97,8 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+:root {
+	font-family: 'Montserrat', serif;
+	scroll-behavior: smooth;
+}
