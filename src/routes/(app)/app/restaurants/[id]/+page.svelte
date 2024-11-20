@@ -78,7 +78,11 @@
 						>
 							<Trash class="size-6" />
 						</Button>
-						<Button variant="outline" class="ml-auto aspect-square p-0">
+						<Button
+							variant="outline"
+							class="ml-auto aspect-square p-0"
+							href={`/app/reviews?restaurant_name=${restaurant.name}`}
+						>
 							<Star class="size-6" />
 						</Button>
 					{/if}

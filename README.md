@@ -1,38 +1,50 @@
-# sv
+# We like Sushi
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This web app is crafted with TypeScript and SvelteKit, designed for sushi enthusiasts. It allows users to review and rate sushi restaurants they have visited, helping fellow sushi lovers discover the best spots.
 
-## Creating a project
+Originally this was made for me and my girlfriend to have a way to rate different sushi restaurants.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```bash
-# create a new project in the current directory
-npx sv create
+- User authentication
+- Restaurant reviews and ratings
+- Search and pagination functionality
+- Responsive design
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Installation
 
-## Developing
+1. Clone the repository:
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+   ```sh
+   git clone https://github.com/CodeINN95612/WeLikeSushi.git
+   ```
 
-```bash
-npm run dev
+2. Navigate to the project directory:
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+   ```sh
+   cd we-like-sushi
+   ```
 
-## Building
+3. Install dependencies:
 
-To create a production version of your app:
+   ```sh
+   npm install
+   ```
 
-```bash
-npm run build
-```
+## Usage
 
-You can preview the production build with `npm run preview`.
+1. Start the development server:
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+   ```sh
+   npm run dev
+   ```
+
+2. Open your browser and visit the site
+
+## Contributing
+
+Currently contributing is not allowed.
+
+## License
+
+This project is licensed under the MIT License.

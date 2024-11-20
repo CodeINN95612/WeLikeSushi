@@ -1,21 +1,20 @@
 <script lang="ts">
-	import { invalidateAll } from '$app/navigation';
 	import SideNav from '$lib/components/app/SideNav.svelte';
 	import ThemeToggle from '$lib/components/app/ThemeToggle.svelte';
 	import WeLikeSushi from '$lib/components/app/WeLikeSushi.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
+	import { invalidateAll } from '$app/navigation';
 
-	let { children, layoutData }: { children: Snippet; layoutData: LayoutData } = $props();
+	let { children, data }: { children: Snippet; data: LayoutData } = $props();
 
 	async function logout() {
-		const { error } = await layoutData.supabase.auth.signOut();
+		const { error } = await data.supabase.auth.signOut();
 		if (error) {
 			console.error(error);
 		}
-		//invalidateAll();
+		invalidateAll();
 	}
 </script>
 

@@ -5,26 +5,24 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import type { StatusResponseData } from '$lib/models/common/StatusResponse';
-	import type { ReviewView } from '$lib/models/reviews/ReviewView';
+	import { filterReviewView, type ReviewView } from '$lib/models/reviews/ReviewView';
 	import { Plus } from 'lucide-svelte';
+	import ReviewItem from './ReviewItem.svelte';
+	import { page } from '$app/stores';
 
-	let searchQuery = $state('');
+	const initialRestaurant = $page.url.searchParams.get('restaurant_name') ?? '';
 
-	type Props = {};
-
-	let {}: Props = $props();
+	let searchQuery = $state(initialRestaurant);
+	let reviews = $state<ReviewView[]>([]);
+	let filteredReviews = $derived(reviews.filter((r) => filterReviewView(r, searchQuery)));
 
 	const findReviews = async () => {
 		const res = await fetch('/api/reviews');
 		if (res.ok) {
 			const data = (await res.json()) as StatusResponseData<ReviewView[]>;
 			if (data.success) {
-				return data.value;
-			} else {
-				return [];
+				reviews = data.value;
 			}
-		} else {
-			return [];
 		}
 	};
 </script>
@@ -36,22 +34,18 @@
 	</Button>
 </div>
 
-{#await findReviews()}
-	<Skeleton class="min-h-[300px] w-full" />
-{:then reviews}
-	{#if reviews.length === 0}
-		<NoDataFound data_title="Reviews" new_url="reviews/new" />
-	{:else}
-		{#each reviews as review (review.id)}
-			<div class="flex gap-5">
-				<p>{review.restaurant}</p>
-				<p>{review.rating}</p>
-				<p>{review.reviewer}</p>
-				<p>{review.review_date}</p>
-				<p>{review.review}</p>
-			</div>
-		{/each}
-	{/if}
-{:catch error}
-	<p>Error: {error.message}</p>
-{/await}
+<div class="flex flex-wrap gap-4 py-4">
+	{#await findReviews()}
+		<Skeleton class="min-h-[300px] w-full" />
+	{:then _}
+		{#if reviews.length === 0}
+			<NoDataFound data_title="Reviews" new_url="reviews/new" />
+		{:else}
+			{#each filteredReviews as review (review.id)}
+				<ReviewItem {review} />
+			{/each}
+		{/if}
+	{:catch error}
+		<p>Error: {error.message}</p>
+	{/await}
+</div>

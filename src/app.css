@@ -34,6 +34,27 @@
 		--ring: 222.2 84% 4.9%;
 
 		--radius: 0.5rem;
+
+		/* We Like Sushi */
+		--wls-background: 0 5% 4.1%; /* #120d0b */
+		--wls-foreground: 25 12% 92.5%; /* #ece5e0 */
+		--wls-muted: 25 10% 15%; /* A muted tone based on background */
+		--wls-muted-foreground: 25 10% 70%; /* Muted text foreground */
+		--wls-popover: 0 5% 4.1%; /* Matches background */
+		--wls-popover-foreground: 25 12% 92.5%; /* Matches foreground */
+		--wls-card: 0 5% 4.1%; /* Matches background */
+		--wls-card-foreground: 25 12% 92.5%; /* Matches foreground */
+		--wls-border: 25 12% 20%; /* A darker border tone */
+		--wls-input: 25 12% 20%; /* Matches border for consistency */
+		--wls-primary: 27 100% 79.2%; /* #ffbb94 */
+		--wls-primary-foreground: 27 90% 10%; /* High contrast foreground for primary */
+		--wls-secondary: 22 87% 58%; /* #f17b37 */
+		--wls-secondary-foreground: 27 90% 10%; /* High contrast foreground for secondary */
+		--wls-accent: 320 46% 21%; /* #4e1d3e */
+		--wls-accent-foreground: 319 40% 85%; /* High contrast foreground for accent */
+		--wls-destructive: 0 72% 50%; /* A bright red for destructive actions */
+		--wls-destructive-foreground: 0 0% 98%; /* High contrast foreground for destructive */
+		--wls-ring: 27 100% 79.2%; /* Matches primary for focus rings */
 	}
 
 	.dark {

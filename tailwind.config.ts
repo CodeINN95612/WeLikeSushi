@@ -48,6 +48,41 @@ const config: Config = {
 				card: {
 					DEFAULT: 'hsl(var(--card) / <alpha-value>)',
 					foreground: 'hsl(var(--card-foreground) / <alpha-value>)'
+				},
+				wls: {
+					border: 'hsl(var(--wls-border) / <alpha-value>)',
+					input: 'hsl(var(--wls-input) / <alpha-value>)',
+					ring: 'hsl(var(--wls-ring) / <alpha-value>)',
+					background: 'hsl(var(--wls-background) / <alpha-value>)',
+					foreground: 'hsl(var(--wls-foreground) / <alpha-value>)',
+					primary: {
+						DEFAULT: 'hsl(var(--wls-primary) / <alpha-value>)',
+						foreground: 'hsl(var(--wls-primary-foreground) / <alpha-value>)'
+					},
+					secondary: {
+						DEFAULT: 'hsl(var(--wls-secondary) / <alpha-value>)',
+						foreground: 'hsl(var(--wls-secondary-foreground) / <alpha-value>)'
+					},
+					destructive: {
+						DEFAULT: 'hsl(var(--wls-destructive) / <alpha-value>)',
+						foreground: 'hsl(var(--wls-destructive-foreground) / <alpha-value>)'
+					},
+					muted: {
+						DEFAULT: 'hsl(var(--wls-muted) / <alpha-value>)',
+						foreground: 'hsl(var(--wls-muted-foreground) / <alpha-value>)'
+					},
+					accent: {
+						DEFAULT: 'hsl(var(--wls-accent) / <alpha-value>)',
+						foreground: 'hsl(var(--wls-accent-foreground) / <alpha-value>)'
+					},
+					popover: {
+						DEFAULT: 'hsl(var(--wls-popover) / <alpha-value>)',
+						foreground: 'hsl(var(--wls-popover-foreground) / <alpha-value>)'
+					},
+					card: {
+						DEFAULT: 'hsl(var(--wls-card) / <alpha-value>)',
+						foreground: 'hsl(var(--wls-card-foreground) / <alpha-value>)'
+					}
 				}
 			},
 			borderRadius: {

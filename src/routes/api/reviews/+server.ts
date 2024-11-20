@@ -1,11 +1,11 @@
+import { invalidateAll } from '$app/navigation';
 import { StatusResponse } from '$lib/models/common/StatusResponse';
 import type { ReviewView } from '$lib/models/reviews/ReviewView';
 import { supabase_admin } from '$lib/server/supabase_admin';
-import { supabase } from '$lib/supabase';
 import type { RequestHandler } from '@sveltejs/kit';
 
-export const GET: RequestHandler = async () => {
-	const { data, error } = await supabase
+export const GET: RequestHandler = async ({ locals }) => {
+	const { data, error } = await locals.supabase
 		.from('reviews')
 		.select('*, restaurant:restaurants(name)')
 		.order('visit_date', { ascending: false });
@@ -23,7 +23,10 @@ export const GET: RequestHandler = async () => {
 				data: { user },
 				error
 			} = await supabase_admin.auth.admin.getUserById(review.user_id!);
-			console.log('supabase_admin error', error);
+			if (error) {
+				console.log('Error getting user', error.message);
+				await invalidateAll();
+			}
 			return {
 				id: review.id,
 				restaurant: review.restaurant!.name,

@@ -1,5 +1,4 @@
 import type { RestaurantWithImages } from '$lib/models/restaurants/RestaurantWithImages';
-import { supabase } from '$lib/supabase';
 import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import type { RestaurantInsert } from '$lib/models/restaurants/RestaurantInsert';
@@ -7,8 +6,9 @@ import type { RestaurantUpdate } from '$lib/models/restaurants/RestaurantUpdate'
 import type { TablesInsert } from '$lib/supabase.types';
 import { PRIVATE_STORAGE_URL } from '$env/static/private';
 import sharp from 'sharp';
+import type { WeLikeSushiDatabase } from '$lib/data/types';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals: { supabase } }) => {
 	const { id } = params;
 
 	const emptyRestaurant: RestaurantWithImages = {
@@ -54,7 +54,7 @@ export const load: PageServerLoad = async ({ params }) => {
 const STORAGE_BUCKET = 'restaurant_images';
 
 export const actions: Actions = {
-	delete: async ({ params }) => {
+	delete: async ({ params, locals: { supabase } }) => {
 		const { id } = params;
 
 		//Delete images from storage
@@ -105,7 +105,7 @@ export const actions: Actions = {
 
 		redirect(302, '/app/restaurants');
 	},
-	save: async ({ request, params }) => {
+	save: async ({ request, params, locals: { supabase } }) => {
 		//temp
 		const errors: string[] = [];
 		const { id } = params;
@@ -135,7 +135,7 @@ export const actions: Actions = {
 		}
 
 		if (id == 'new') {
-			const insertError = await addNewRestaurant({
+			const insertError = await addNewRestaurant(supabase, {
 				address: address as string,
 				city: city as string,
 				country: country as string,
@@ -150,7 +150,7 @@ export const actions: Actions = {
 				};
 			}
 		} else {
-			const updateError = await updateRestaurant({
+			const updateError = await updateRestaurant(supabase, {
 				id: id as string,
 				address: address as string,
 				city: city as string,
@@ -173,17 +173,20 @@ export const actions: Actions = {
 	}
 };
 
-async function addNewRestaurant(restaurant: RestaurantInsert): Promise<string | null> {
+async function addNewRestaurant(
+	supabase: WeLikeSushiDatabase,
+	restaurant: RestaurantInsert
+): Promise<string | null> {
 	if (restaurant.images.length === 0) {
 		return 'At least one image is required.';
 	}
 
 	const newid = crypto.randomUUID();
 	const insertedImages: { path: string; fullPath: string }[] = [];
-	let storageError = await uploadImages(restaurant, newid, insertedImages);
+	let storageError = await uploadImages(supabase, restaurant, newid, insertedImages);
 
 	if (storageError) {
-		await cleanupImages(insertedImages);
+		await cleanupImages(supabase, insertedImages);
 		console.error('Storage Error:', storageError);
 		return storageError;
 	}
@@ -242,7 +245,7 @@ async function addNewRestaurant(restaurant: RestaurantInsert): Promise<string | 
 
 		return null;
 	} catch (error: unknown) {
-		await cleanupImages(insertedImages);
+		await cleanupImages(supabase, insertedImages);
 		console.error('Error adding restaurant:', error);
 		if (error instanceof Error) {
 			return error.message;
@@ -252,28 +255,31 @@ async function addNewRestaurant(restaurant: RestaurantInsert): Promise<string | 
 	}
 }
 
-async function updateRestaurant(restaurant: RestaurantUpdate): Promise<string | null> {
+async function updateRestaurant(
+	supabase: WeLikeSushiDatabase,
+	restaurant: RestaurantUpdate
+): Promise<string | null> {
 	const insertedImages: { fullPath: string; path: string }[] = [];
-	const storageError = await uploadImages(restaurant, restaurant.id, insertedImages);
+	const storageError = await uploadImages(supabase, restaurant, restaurant.id, insertedImages);
 
 	if (storageError) {
-		await cleanupImages(insertedImages);
+		await cleanupImages(supabase, insertedImages);
 		console.error('Storage Error:', storageError);
 		return storageError;
 	}
 
-	const updateError = await updateRestaurantDetails(restaurant);
+	const updateError = await updateRestaurantDetails(supabase, restaurant);
 
 	if (updateError) {
-		await cleanupImages(insertedImages);
+		await cleanupImages(supabase, insertedImages);
 		console.error('Update Error:', updateError);
 		return updateError;
 	}
 
-	const imageInsertError = await insertRestaurantImages(restaurant, insertedImages);
+	const imageInsertError = await insertRestaurantImages(supabase, restaurant, insertedImages);
 
 	if (imageInsertError) {
-		await cleanupImages(insertedImages);
+		await cleanupImages(supabase, insertedImages);
 		console.error('Image Insert Error:', imageInsertError);
 		return imageInsertError;
 	}
@@ -282,6 +288,7 @@ async function updateRestaurant(restaurant: RestaurantUpdate): Promise<string | 
 }
 
 async function uploadImages(
+	supabase: WeLikeSushiDatabase,
 	restaurant: RestaurantUpdate | RestaurantInsert,
 	restaurant_id: string,
 	insertedImages: { fullPath: string; path: string }[]
@@ -300,8 +307,6 @@ async function uploadImages(
 			const metadata = await sharp(buffer).metadata();
 
 			if (metadata.size && metadata.size > MAX_IMAGE_SIZE_BYTES) {
-				console.log(`Optimizing image: ${image.name}, original size: ${metadata.size} bytes`);
-
 				// Resize and compress image
 				buffer = await sharp(buffer)
 					.resize({
@@ -327,7 +332,10 @@ async function uploadImages(
 	return null;
 }
 
-async function cleanupImages(insertedImages: { fullPath: string; path: string }[]): Promise<void> {
+async function cleanupImages(
+	supabase: WeLikeSushiDatabase,
+	insertedImages: { fullPath: string; path: string }[]
+): Promise<void> {
 	if (insertedImages.length === 0) return;
 
 	const { error } = await supabase.storage
@@ -336,7 +344,10 @@ async function cleanupImages(insertedImages: { fullPath: string; path: string }[
 	if (error) console.error('Cleanup Error:', error.message);
 }
 
-async function updateRestaurantDetails(restaurant: RestaurantUpdate): Promise<string | null> {
+async function updateRestaurantDetails(
+	supabase: WeLikeSushiDatabase,
+	restaurant: RestaurantUpdate
+): Promise<string | null> {
 	const { error } = await supabase
 		.from('restaurants')
 		.update({
@@ -353,6 +364,7 @@ async function updateRestaurantDetails(restaurant: RestaurantUpdate): Promise<st
 }
 
 async function insertRestaurantImages(
+	supabase: WeLikeSushiDatabase,
 	restaurant: RestaurantUpdate,
 	insertedImages: { fullPath: string; path: string }[]
 ): Promise<string | null> {
