@@ -4,7 +4,7 @@
 
 	import { Input } from '$lib/components/ui/input';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import type { StatusResponseData } from '$lib/models/common/StatusResponse';
+	import type { StatusResponseData } from '$lib/models/common/StatusResponseData';
 	import { filterReviewView, type ReviewView } from '$lib/models/reviews/ReviewView';
 	import { Plus } from 'lucide-svelte';
 	import ReviewItem from './ReviewItem.svelte';
@@ -17,7 +17,7 @@
 	let filteredReviews = $derived(reviews.filter((r) => filterReviewView(r, searchQuery)));
 
 	const findReviews = async () => {
-		const res = await fetch('/api/reviews');
+		const res = await fetch('/api/app/reviews');
 		if (res.ok) {
 			const data = (await res.json()) as StatusResponseData<ReviewView[]>;
 			if (data.success) {

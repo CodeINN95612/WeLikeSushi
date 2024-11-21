@@ -23,7 +23,7 @@
 
 	async function save() {
 		try {
-			const response = await fetch('/api/rubric', {
+			const response = await fetch('/api/app/rubric', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
