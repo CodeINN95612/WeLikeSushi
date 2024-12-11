@@ -6,8 +6,10 @@
 		review: ReviewView;
 	};
 	import { goto } from '$app/navigation';
+	import { Reviewers } from '$lib/data/reviewers';
 
 	let { review }: Props = $props();
+	let reviewer = $derived(Reviewers.find((r) => r.value === review.reviewer));
 
 	async function navigateToItem() {
 		await goto(`reviews/${review.id}`);
@@ -28,6 +30,6 @@
 		<div class="flex items-center">
 			<span class="ml-2">{review.rating} / 10</span>
 		</div>
-		<span class="ml-auto text-xs">- {review.reviewer}</span>
+		<span class="ml-auto text-xs">- {reviewer?.label}</span>
 	</Card.Footer>
 </Card.Root>

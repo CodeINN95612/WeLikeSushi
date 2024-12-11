@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import * as Card from '$lib/components/ui/card';
-	import type { RestaurantWithImages } from '$lib/models/RestaurantWithImages';
+	import type { RestaurantWithImages } from '$lib/models/restaurants/RestaurantWithImages';
 	import { Badge } from '../ui/badge';
 	import CardImageCarrousel from './CardImageCarrousel.svelte';
 

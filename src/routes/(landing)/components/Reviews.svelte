@@ -126,7 +126,7 @@
 	<div class="flex items-center justify-center gap-4 text-wls-primary-foreground">
 		<button
 			class="flex items-center rounded bg-wls-primary p-2 hover:bg-wls-secondary disabled:bg-wls-muted"
-			disabled={!reviews.previousPage}
+			disabled={!reviews.previousPage || params.page === 1}
 			onclick={() => loadReviews(params.page - 1)}
 		>
 			<ArrowLeft class="size-6" />
@@ -136,7 +136,7 @@
 		</span>
 		<button
 			class="flex items-center rounded bg-wls-primary p-2 hover:bg-wls-secondary disabled:bg-wls-muted"
-			disabled={!reviews.nextPage}
+			disabled={!reviews.nextPage || params.page === reviews.totalPages}
 			onclick={() => loadReviews(params.page + 1)}
 		>
 			<ArrowRight class="size-6" />

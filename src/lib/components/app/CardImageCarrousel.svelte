@@ -27,12 +27,12 @@
 </script>
 
 {#if images.length === 0}
-	<div class="flex h-full w-full flex-col items-center justify-center rounded-t-lg border">
+	<div class="flex h-[250px] w-full flex-col items-center justify-center rounded-t-lg border">
 		<Image />
 		No images submited
 	</div>
 {:else if images.length === 1}
-	<div class="flex h-full w-full items-center justify-center overflow-hidden rounded-t-lg">
+	<div class="flex max-h-[200px] w-full items-center justify-center overflow-hidden rounded-t-lg">
 		<img src={images[0].url} alt={images[0].description} />
 	</div>
 {:else}
@@ -40,7 +40,7 @@
 		<div class="flex overflow-hidden rounded-t-lg">
 			{#each images as image (image.id)}
 				<div
-					class="h-full w-full flex-shrink-0 transition-transform duration-500"
+					class="max-h-[200px] w-full flex-shrink-0 transition-transform duration-500"
 					style="transform: translateX({-currentIndex * 100}%)"
 				>
 					<div class="flex h-full w-full items-center justify-center rounded-t-lg">

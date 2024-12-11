@@ -3,7 +3,7 @@ import { redirect, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import type { RestaurantInsert } from '$lib/models/restaurants/RestaurantInsert';
 import type { RestaurantUpdate } from '$lib/models/restaurants/RestaurantUpdate';
-import type { TablesInsert } from '$lib/supabase.types';
+import type { TablesInsert } from '$lib/supabase.types.js';
 import { PRIVATE_STORAGE_URL } from '$env/static/private';
 import sharp from 'sharp';
 import type { WeLikeSushiDatabase } from '$lib/data/types';
@@ -106,7 +106,6 @@ export const actions: Actions = {
 		redirect(302, '/app/restaurants');
 	},
 	save: async ({ request, params, locals: { supabase } }) => {
-		//temp
 		const errors: string[] = [];
 		const { id } = params;
 		const formData = await request.formData();
@@ -182,8 +181,9 @@ async function addNewRestaurant(
 	}
 
 	const newid = crypto.randomUUID();
+
 	const insertedImages: { path: string; fullPath: string }[] = [];
-	let storageError = await uploadImages(supabase, restaurant, newid, insertedImages);
+	const storageError = await uploadImages(supabase, restaurant, newid, insertedImages);
 
 	if (storageError) {
 		await cleanupImages(supabase, insertedImages);
@@ -192,25 +192,6 @@ async function addNewRestaurant(
 	}
 
 	try {
-		// Upload images to Supabase Storage
-		for (const image of restaurant.images) {
-			const arrayBuffer = await image.arrayBuffer();
-			const buffer = Buffer.from(arrayBuffer);
-			const filePath = `public/r-id-${newid}/${image.name}`;
-
-			const { data, error } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, buffer, {
-				contentType: image.type,
-				upsert: true
-			});
-
-			if (error) {
-				storageError = error.message;
-				throw new Error(`Failed to upload image: ${storageError}`);
-			}
-
-			if (data) insertedImages.push(data);
-		}
-
 		// Insert the restaurant and images within a transaction
 		const { error: insertError } = await supabase.from('restaurants').insert([
 			{

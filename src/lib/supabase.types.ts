@@ -136,7 +136,7 @@ export type Database = {
 					rating: number | null;
 					restaurant_id: string | null;
 					review_text: string | null;
-					user_id: string | null;
+					reviewer: string;
 					visit_date: string;
 				};
 				Insert: {
@@ -145,7 +145,7 @@ export type Database = {
 					rating?: number | null;
 					restaurant_id?: string | null;
 					review_text?: string | null;
-					user_id?: string | null;
+					reviewer: string;
 					visit_date: string;
 				};
 				Update: {
@@ -154,7 +154,7 @@ export type Database = {
 					rating?: number | null;
 					restaurant_id?: string | null;
 					review_text?: string | null;
-					user_id?: string | null;
+					reviewer?: string;
 					visit_date?: string;
 				};
 				Relationships: [

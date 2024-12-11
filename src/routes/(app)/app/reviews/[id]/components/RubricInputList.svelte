@@ -2,22 +2,20 @@
 	import type { RubricView } from '$lib/models/rubric/RubricView';
 
 	type Props = {
-		rubric: RubricView[];
+		rubricValues: {
+			id: string;
+			name: string;
+			description: string;
+			value: number;
+		}[];
 		id: string;
 		name: string;
 	};
 	import { Label } from '$lib/components/ui/label';
 	import { Input } from '$lib/components/ui/input';
 
-	let { rubric, id, name }: Props = $props();
-	let rubricValues = $state(
-		rubric.map((r) => ({
-			id: r.id,
-			name: r.name,
-			description: r.description,
-			value: 0
-		}))
-	);
+	let { id, name, rubricValues = $bindable() }: Props = $props();
+
 	let rubricValuesJson = $derived(JSON.stringify(rubricValues));
 </script>
 
