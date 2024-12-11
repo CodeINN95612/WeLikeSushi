@@ -1,15 +1,16 @@
 <script lang="ts">
 	import PageTitle from '$lib/components/app/PageTitle.svelte';
-	import type { RubricView } from '$lib/models/rubric/RubricView';
+	import { Alert } from '$lib/components/ui/alert';
+	import type { PageData } from './$types';
 	import ReviewForm from './components/ReviewForm.svelte';
 
-	const fakeRubric: RubricView[] = [
-		{ id: '1', name: 'Service', description: 'How was the service?', weight: 40 },
-		{ id: '2', name: 'Food', description: 'How was the food?', weight: 40 },
-		{ id: '3', name: 'Ambiance', description: 'How was the ambiance?', weight: 20 }
-	];
+	let { data }: { data: PageData } = $props();
 </script>
 
 <PageTitle back="/app/reviews">Review</PageTitle>
 
-<ReviewForm rubric={fakeRubric} />
+{#if data.error}
+	<Alert variant="destructive">Error: {data.error}</Alert>
+{:else}
+	<ReviewForm rubric={data.rubric!} restaurants={data.restaurants!} reviewers={data.reviewers!} />
+{/if}

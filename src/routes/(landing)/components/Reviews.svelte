@@ -62,10 +62,10 @@
 		<input
 			type="text"
 			placeholder="Filter by restaurant..."
-			class="bg-wls-background ring-offset-wls-background placeholder:text-wls-muted-foreground border-wls-input focus-visible:ring-wls-ring flex h-10 rounded-md border px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+			class="flex h-10 rounded-md border border-wls-input bg-wls-background px-3 py-2 text-sm ring-offset-wls-background placeholder:text-wls-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wls-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 		/>
 		<select
-			class="bg-wls-card text-wls-foreground border-wls-border focus:border-wls-primary ml-2 rounded border p-2 focus:outline-none"
+			class="ml-2 rounded border border-wls-border bg-wls-card p-2 text-wls-foreground focus:border-wls-primary focus:outline-none"
 		>
 			<option value="latest">Latest</option>
 			<option value="oldest">Oldest</option>
@@ -76,7 +76,7 @@
 	<div class="flex flex-col gap-4">
 		{#if loading}
 			{#each Array.from({ length: 3 }) as _, i}
-				<div class="border-wls-muted relative flex items-center rounded-lg border-2 p-4">
+				<div class="relative flex items-center rounded-lg border-2 border-wls-muted p-4">
 					<ReviewSkelleton class="mr-4 size-[200px] rounded-lg" />
 					<div class="flex-1 space-y-4">
 						<ReviewSkelleton class="h-6 w-1/3 rounded-md" />
@@ -88,7 +88,7 @@
 				</div>
 			{/each}
 		{:else if error}
-			<div class="bg-wls-destructive text-wls-destructive-foreground rounded-md p-4">
+			<div class="rounded-md bg-wls-destructive p-4 text-wls-destructive-foreground">
 				{error}
 			</div>
 		{:else if reviews.data.length === 0}
@@ -96,7 +96,7 @@
 		{:else}
 			{#each reviews.data as review}
 				<div
-					class="border-wls-border bg-wls-card text-wls-foreground relative flex items-center rounded-lg border-2 p-4"
+					class="relative flex items-center rounded-lg border-2 border-wls-border bg-wls-card p-4 text-wls-foreground"
 				>
 					<img
 						src="https://via.placeholder.com/200"
@@ -105,16 +105,16 @@
 					/>
 					<div class="flex flex-col">
 						<h4 class="text-xl font-semibold">{review.restaurant}</h4>
-						<p class="text-wls-muted-foreground text-sm">
+						<p class="text-sm text-wls-muted-foreground">
 							Reviewed by {review.reviewer} on {review.review_date}
 						</p>
 						<p class="mt-2">{review.review}</p>
-						<div class="text-wls-secondary mt-2">Rating: {review.rating} / 5</div>
+						<div class="mt-2 text-wls-secondary">Rating: {review.rating} / 5</div>
 					</div>
 
 					<a
 						href={`/reviews/${review.id}`}
-						class="text-wls-primary hover:text-wls-secondary absolute right-1 top-1 flex rounded-md p-2 underline underline-offset-2"
+						class="absolute right-1 top-1 flex rounded-md p-2 text-wls-primary underline underline-offset-2 hover:text-wls-secondary"
 					>
 						Read More
 						<ExternalLink class="ml-1 size-4" />
@@ -123,9 +123,9 @@
 			{/each}
 		{/if}
 	</div>
-	<div class="text-wls-primary-foreground flex items-center justify-center gap-4">
+	<div class="flex items-center justify-center gap-4 text-wls-primary-foreground">
 		<button
-			class="bg-wls-primary hover:bg-wls-secondary disabled:bg-wls-muted flex items-center rounded p-2"
+			class="flex items-center rounded bg-wls-primary p-2 hover:bg-wls-secondary disabled:bg-wls-muted"
 			disabled={!reviews.previousPage}
 			onclick={() => loadReviews(params.page - 1)}
 		>
@@ -135,7 +135,7 @@
 			Page {params.page} of {reviews.totalPages}
 		</span>
 		<button
-			class="bg-wls-primary hover:bg-wls-secondary disabled:bg-wls-muted flex items-center rounded p-2"
+			class="flex items-center rounded bg-wls-primary p-2 hover:bg-wls-secondary disabled:bg-wls-muted"
 			disabled={!reviews.nextPage}
 			onclick={() => loadReviews(params.page + 1)}
 		>

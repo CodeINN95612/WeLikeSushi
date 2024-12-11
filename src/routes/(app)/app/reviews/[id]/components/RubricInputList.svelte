@@ -30,13 +30,13 @@
 	{#each rubricValues as item, index (item.id)}
 		<div class="flex items-end justify-center p-4 hover:bg-muted/50">
 			<div class="flex-1">
-				<Label for="rubric-{index}">
-					<span class="font-normal">
+				<Label for="rubric-{index}" class="">
+					<span class="font-normal text-primary">
 						{`${index + 1}. `}
 					</span>
 					{item.name}:
 				</Label>
-				<p class="pl-4 text-xs text-primary/75">{item.description}</p>
+				<p class="pl-4 text-xs text-secondary-foreground">{item.description}</p>
 			</div>
 			<Input
 				type="number"
